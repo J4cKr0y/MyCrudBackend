@@ -1,11 +1,11 @@
-// Services/ITodoService.cs
+// Data/ITodoRepository.cs
 using MyCrudBackend.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MyCrudBackend.Services
+namespace MyCrudBackend.Data
 {
-    public interface ITodoService
+    public interface ITodoRepository
     {
         Task<IEnumerable<TodoItem>> GetAllAsync();
         Task<TodoItem?> GetByIdAsync(int id);

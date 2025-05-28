@@ -8,6 +8,7 @@ using MyCrudBackend.Data;
 using MyCrudBackend.Models;
 using MyCrudBackend.Notifications;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyCrudBackend.Services
 {
@@ -22,27 +23,26 @@ namespace MyCrudBackend.Services
             _notificationService = notificationService;
         }
 
-        public IEnumerable<TodoItem> GetAll() => _repository.GetAll();
+        public async Task<IEnumerable<TodoItem>> GetAllAsync() => await _repository.GetAllAsync();
 
-        public TodoItem? GetById(int id) => _repository.GetById(id);
+        public async Task<TodoItem?> GetByIdAsync(int id) => await _repository.GetByIdAsync(id);
 
-        public TodoItem Create(TodoItem item)
+        public async Task<TodoItem> CreateAsync(TodoItem item)
         {
-            // Todo : Ajouter des règles de validation
-            var created = _repository.Create(item);
+            var created = await _repository.CreateAsync(item);
             _notificationService.EnqueueNotification($"[Create] Item créé : {created.Id}");
             return created;
         }
 
-        public void Update(TodoItem item)
+        public async Task UpdateAsync(TodoItem item)
         {
-            _repository.Update(item);
+            await _repository.UpdateAsync(item);
             _notificationService.EnqueueNotification($"[Update] Item mis à jour : {item.Id}");
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
-            _repository.Delete(id);
+            await _repository.DeleteAsync(id);
             _notificationService.EnqueueNotification($"[Delete] Item supprimé : {id}");
         }
     }
