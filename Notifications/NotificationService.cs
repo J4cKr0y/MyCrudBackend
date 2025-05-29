@@ -9,7 +9,7 @@ namespace MyCrudBackend.Notifications
     public class NotificationService : INotificationService, IDisposable
     {
         public event Action<string>? OnNotification;
-        private readonly ConcurrentQueue<string> _queue = new(); //garantit l’ordre d’arrivée des messages
+        private readonly ConcurrentQueue<string> _queue = new(); //garantit l'ordre d'arrivée des messages
         private readonly CancellationTokenSource _cts = new();
 
         public NotificationService()
@@ -27,7 +27,7 @@ namespace MyCrudBackend.Notifications
         {
             while (!_cts.Token.IsCancellationRequested)
             {
-                if (_queue.TryDequeue(out string message))
+                if (_queue.TryDequeue(out string? message) && message != null)
                 {
                     // Notification immédiate à tous les abonnés.
                     OnNotification?.Invoke(message);

@@ -1,8 +1,8 @@
 // Controllers/EventsController.cs
 
-/*L’endpoint /api/events/sse diffuse en continu les notifications. 
+/*L'endpoint /api/events/sse diffuse en continu les notifications. 
 Chaque message est formaté selon le protocole SSE 
-(préfixé par data: suivi d’un saut de ligne, puis une ligne vide) 
+(préfixé par data: suivi d'un saut de ligne, puis une ligne vide) 
 pour être interprété côté client par un EventSource.*/
 
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +27,8 @@ namespace MyCrudBackend.Controllers
         [HttpGet("sse")]
         public async Task GetSse(CancellationToken cancellationToken)
         {
-            Response.Headers.Add("Content-Type", "text/event-stream");
-            Response.Headers.Add("Cache-Control", "no-cache");
+            Response.Headers["Content-Type"] = "text/event-stream";
+            Response.Headers["Cache-Control"] = "no-cache";
 
             // Utilisation d'une file locale pour accumuler les messages reçus par l'événement (pour assurer un traitement asynchrone).
             var messages = new ConcurrentQueue<string>();

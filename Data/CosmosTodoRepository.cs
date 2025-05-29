@@ -11,6 +11,7 @@ namespace MyCrudBackend.Data
     public class CosmosTodoRepository : ITodoRepository
     {
         private readonly Container _container;
+        private static int _counter = 0;
 
         public CosmosTodoRepository(CosmosClient cosmosClient, string databaseName, string containerName)
         {
@@ -47,12 +48,14 @@ namespace MyCrudBackend.Data
 
         public async Task<TodoItem> CreateAsync(TodoItem item)
         {
-            // on peut générer un ID si nécessaire
+            // Génération d'ID plus fiable avec un compteur atomique et timestamp
             if (item.Id == 0)
             {
-            // Todo: Ce mécanisme d'auto-génération est basique, utiliser un GUID.
-                item.Id = new Random().Next(1, 1000000);
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                var atomicCounter = Interlocked.Increment(ref _counter);
+                item.Id = (int)(timestamp % 1000000) + atomicCounter;
             }
+            
             var response = await _container.CreateItemAsync(item, new PartitionKey(item.Id.ToString()));
             return response.Resource;
         }
@@ -65,7 +68,14 @@ namespace MyCrudBackend.Data
 
         public async Task DeleteAsync(int id)
         {
-            await _container.DeleteItemAsync<TodoItem>(id.ToString(), new PartitionKey(id.ToString()));
+            try
+            {
+                await _container.DeleteItemAsync<TodoItem>(id.ToString(), new PartitionKey(id.ToString()));
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // L'item n'existe pas, on ignore l'erreur
+            }
         }
     }
 }

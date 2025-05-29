@@ -2,6 +2,7 @@
 using MyCrudBackend.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyCrudBackend.Data
 {
@@ -10,34 +11,38 @@ namespace MyCrudBackend.Data
         private readonly List<TodoItem> _items = new();
         private int _nextId = 1;
 
-        public IEnumerable<TodoItem> GetAll() => _items;
+        public Task<IEnumerable<TodoItem>> GetAllAsync() 
+            => Task.FromResult<IEnumerable<TodoItem>>(_items);
 
-        public TodoItem? GetById(int id) => _items.FirstOrDefault(x => x.Id == id);
+        public Task<TodoItem?> GetByIdAsync(int id) 
+            => Task.FromResult(_items.FirstOrDefault(x => x.Id == id));
 
-        public TodoItem Create(TodoItem item)
+        public Task<TodoItem> CreateAsync(TodoItem item)
         {
             item.Id = _nextId++;
             _items.Add(item);
-            return item;
+            return Task.FromResult(item);
         }
 
-        public void Update(TodoItem item)
+        public Task UpdateAsync(TodoItem item)
         {
-            var existing = GetById(item.Id);
+            var existing = _items.FirstOrDefault(x => x.Id == item.Id);
             if (existing is not null)
             {
                 existing.Title = item.Title;
                 existing.Description = item.Description;
             }
+            return Task.CompletedTask;
         }
 
-        public void Delete(int id)
+        public Task DeleteAsync(int id)
         {
-            var item = GetById(id);
+            var item = _items.FirstOrDefault(x => x.Id == id);
             if (item is not null)
             {
                 _items.Remove(item);
             }
+            return Task.CompletedTask;
         }
     }
 }
